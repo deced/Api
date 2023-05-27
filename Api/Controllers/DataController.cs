@@ -25,6 +25,15 @@ public class DataController : Controller
     {
         var code = FormatHelper.ConvertToCode(request.Question);
 
+        var question = new Question()
+        {
+            Answers = request.Answers,
+            QuestionText = request.Question,
+            QuestionCode = FormatHelper.ConvertToCode(request.Question),
+        };
+
+        await _questionsRepository.InsertOneAsync(question);
+        
         var questionAnswer = await _questionAnswersRepository.FindOneAsync(x => x.QuestionCode == code);
 
         if (questionAnswer == null)
@@ -44,6 +53,9 @@ public class DataController : Controller
     [HttpPost]
     public async Task<IActionResult> SubmitTest([FromBody]SubmitTestModel model)
     {
+        if (model.Mark < 20)
+            return Ok();
+        
         var questions = model.Questions.Select(x => new Question()
         {
             QuestionText = x.Question,
@@ -53,7 +65,7 @@ public class DataController : Controller
 
         var questionAnswers = model.Questions.Select(x => new QuestionAnswer()
         {
-            Sure = model.Mark == 20 ? 10 : 5,
+            Sure = 10,
             QuestionCode = FormatHelper.ConvertToCode(x.Question),
             AnswerCode = FormatHelper.ConvertToCode(x.SelectedAnswer)
         });
