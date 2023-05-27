@@ -20,16 +20,24 @@ public class DataController : Controller
         _questionAnswersRepository = questionAnswerRepository;
     }
 
-    [HttpGet]
-    public async Task<IActionResult> GetAnswer([FromQuery]string question)
+    [HttpPost]
+    public async Task<IActionResult> GetAnswer([FromBody]GetAnswerRequest request)
     {
-        var code = FormatHelper.ConvertToCode(question);
+        var code = FormatHelper.ConvertToCode(request.Question);
 
         var questionAnswer = await _questionAnswersRepository.FindOneAsync(x => x.QuestionCode == code);
 
+        if (questionAnswer == null)
+            return Json(new AnswerResponse()
+            {
+                Answer = -1
+            });
+        
+        request.Answers = request.Answers.Select(FormatHelper.ConvertToCode).ToList();
+        
         return Json(new AnswerResponse()
         {
-            Answer = questionAnswer?.AnswerCode
+            Answer = request.Answers.IndexOf(questionAnswer.AnswerCode) 
         });
     }
 

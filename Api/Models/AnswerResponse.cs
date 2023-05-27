@@ -2,5 +2,5 @@ namespace Api.Models;
 
 public class AnswerResponse
 {
-    public string Answer { get; set; }
+    public int Answer { get; set; }
 }
