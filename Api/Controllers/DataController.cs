@@ -29,7 +29,7 @@ public class DataController : Controller
 
         return Json(new AnswerResponse()
         {
-            Answer = questionAnswer.AnswerCode
+            Answer = questionAnswer?.AnswerCode
         });
     }
 
