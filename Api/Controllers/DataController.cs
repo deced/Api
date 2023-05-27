@@ -61,7 +61,7 @@ public class DataController : Controller
         if (model.Mark < 16)
             return Ok();
         
-        var sure = model.Mark/2;
+        var sure = model.Mark;
 
         var questions = model.Questions.Select(x => new Question()
         {
