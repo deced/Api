@@ -25,15 +25,20 @@ public class DataController : Controller
     {
         var code = FormatHelper.ConvertToCode(request.Question);
 
-        var question = new Question()
-        {
-            Answers = request.Answers,
-            QuestionText = request.Question,
-            QuestionCode = FormatHelper.ConvertToCode(request.Question),
-        };
+        var existingQuestion = await _questionsRepository.FindOneAsync(x => x.QuestionCode == code);
 
-        await _questionsRepository.InsertOneAsync(question);
-        
+        if (existingQuestion == null)
+        {
+            var question = new Question()
+            {
+                Answers = request.Answers,
+                QuestionText = request.Question,
+                QuestionCode = FormatHelper.ConvertToCode(request.Question),
+            };
+
+            await _questionsRepository.InsertOneAsync(question);
+        }
+
         var questionAnswer = await _questionAnswersRepository.FindOneAsync(x => x.QuestionCode == code);
 
         if (questionAnswer == null)
