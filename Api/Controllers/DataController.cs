@@ -58,9 +58,11 @@ public class DataController : Controller
     [HttpPost]
     public async Task<IActionResult> SubmitTest([FromBody]SubmitTestModel model)
     {
-        if (model.Mark < 20)
+        if (model.Mark < 16)
             return Ok();
         
+        var sure = model.Mark/2;
+
         var questions = model.Questions.Select(x => new Question()
         {
             QuestionText = x.Question,
@@ -70,7 +72,7 @@ public class DataController : Controller
 
         var questionAnswers = model.Questions.Select(x => new QuestionAnswer()
         {
-            Sure = 10,
+            Sure = sure,
             QuestionCode = FormatHelper.ConvertToCode(x.Question),
             AnswerCode = FormatHelper.ConvertToCode(x.SelectedAnswer)
         });
@@ -89,10 +91,16 @@ public class DataController : Controller
         {
             var existingQuestionAnswer =
                 await _questionAnswersRepository.FindOneAsync(x => x.QuestionCode == questionAnswer.QuestionCode);
-            if(existingQuestionAnswer != null)
-                continue;
+            if(existingQuestionAnswer == null)
+                await _questionAnswersRepository.InsertOneAsync(questionAnswer);
+            else
+            {
+                if(existingQuestionAnswer.Sure < sure)
+                    existingQuestionAnswer.Sure = sure;
+                
+                await _questionAnswersRepository.ReplaceOneAsync(existingQuestionAnswer);
+            }
 
-            await _questionAnswersRepository.InsertOneAsync(questionAnswer);
         }
 
         return Ok();
