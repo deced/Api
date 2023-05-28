@@ -48,10 +48,17 @@ public class DataController : Controller
             });
         
         request.Answers = request.Answers.Select(FormatHelper.ConvertToCode).ToList();
+        var result = request.Answers.IndexOf(questionAnswer.AnswerCode);
+
+        if (result == -1)
+        {
+            await _questionAnswersRepository.HardDeleteManyAsync(x => x.Id == questionAnswer.Id);
+            Console.WriteLine($"\n-----------------------Removed incorrect question answer {questionAnswer.QuestionCode}\n-----------------------");
+        }
         
         return Json(new AnswerResponse()
         {
-            Answer = request.Answers.IndexOf(questionAnswer.AnswerCode) 
+            Answer = result
         });
     }
 
@@ -95,10 +102,13 @@ public class DataController : Controller
                 await _questionAnswersRepository.InsertOneAsync(questionAnswer);
             else
             {
-                if(existingQuestionAnswer.Sure < sure)
+                if (existingQuestionAnswer.Sure < sure)
+                {
+                    existingQuestionAnswer.AnswerCode = questionAnswer.AnswerCode;
                     existingQuestionAnswer.Sure = sure;
-                
-                await _questionAnswersRepository.ReplaceOneAsync(existingQuestionAnswer);
+
+                    await _questionAnswersRepository.ReplaceOneAsync(existingQuestionAnswer);
+                }
             }
 
         }
