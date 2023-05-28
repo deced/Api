@@ -63,11 +63,15 @@ public class DataController : Controller
         foreach (var questionAnswer in questionAnswers)
         {
             var index = request.Answers.IndexOf(questionAnswer.AnswerCode);
+
             if (index != -1)
-                return Json(new AnswerResponse()
-                {
-                    Answer = index
-                });
+            {
+                if (questionAnswer.Sure == 20)
+                    return Json(new AnswerResponse()
+                    {
+                        Answer = index
+                    });
+            }
         }
 
         return Json(new AnswerResponse()
@@ -90,22 +94,22 @@ public class DataController : Controller
             QuestionCode = FormatHelper.ConvertToCode(x.Question),
             AnswerCode = FormatHelper.ConvertToCode(x.SelectedAnswer)
         });
-        
+
 
         foreach (var questionAnswer in questionAnswers)
         {
             var existingQuestionAnswer =
-                await _questionAnswersRepository.FindOneAsync(x => 
+                await _questionAnswersRepository.FindOneAsync(x =>
                     x.QuestionCode == questionAnswer.QuestionCode &&
                     x.AnswerCode == questionAnswer.AnswerCode);
-            
+
             if (existingQuestionAnswer == null)
                 await _questionAnswersRepository.InsertOneAsync(questionAnswer);
             else
             {
                 if (existingQuestionAnswer.Sure < sure)
                 {
-                   // existingQuestionAnswer.AnswerCode = questionAnswer.AnswerCode;
+                    // existingQuestionAnswer.AnswerCode = questionAnswer.AnswerCode;
                     existingQuestionAnswer.Sure = sure;
 
                     await _questionAnswersRepository.ReplaceOneAsync(existingQuestionAnswer);
