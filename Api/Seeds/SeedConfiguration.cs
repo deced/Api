@@ -16,6 +16,29 @@ public static class SeedConfiguration
         if(await questionsRepository.GetCountAsync(questionsRepository.FilterDefinitionBuilder.Empty) != 0)
             return;
         
+        // var yaps = JsonConvert.DeserializeObject<List<Root>>(File.ReadAllText("yap.json"));
+        //
+        // var questions1 = yaps.Select(x => new QuestionSeedData()
+        // {
+        //     QuestionText = x.question,
+        //     QuestionCode = FormatHelper.ConvertToCode(x.question),
+        //     Answers = x.answers.Select(x => x.text).ToList()
+        // });
+        //
+        //
+        //
+        // var answers1 = yaps.Select(x => new AnswerSeedData()
+        // {
+        //     QuestionCode = FormatHelper.ConvertToCode(x.question),
+        //     AnswerCode = FormatHelper.ConvertToCode(x.answers.First(x => x.isRight).text),
+        // });
+        //
+        // answers1 = answers1.DistinctBy(x => x.QuestionCode);
+        // questions1 = questions1.DistinctBy(x => x.QuestionCode);
+
+      //  File.WriteAllText("yap-answers.json", JsonConvert.SerializeObject(answers1));
+       // File.WriteAllText("yap-questions.json", JsonConvert.SerializeObject(questions1));
+        
         var answersSeedData = JsonConvert.DeserializeObject<List<AnswerSeedData>>(File.ReadAllText("yap-answers.json"));
         var questionsSeedData = JsonConvert.DeserializeObject<List<QuestionSeedData>>(File.ReadAllText("yap-questions.json"));
 
