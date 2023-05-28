@@ -9,7 +9,7 @@ public static class FormatHelper
         if (string.IsNullOrEmpty(value))
             return string.Empty;
 
-        var specialCharacters = "[ !\"`'#%&,:;<>=@{}~—_.\\$\\[\\]\\(\\)\\*\\+\\/\\\\?\\[\\]\\^\\|]+";
+        var specialCharacters = "[ -]+";
         return Regex.Replace(value, specialCharacters, "-").Trim('-').ToLower();
     }
 }
